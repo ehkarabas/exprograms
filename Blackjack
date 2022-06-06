@@ -1,0 +1,246 @@
+import random 
+
+#building deck and players
+cards_deck=[1,2,3,4,5,6,7,8,9,10,10,10,11]*4 #assigning 10 for King,Jack,Queen and 11 for Ace
+players_deck={}
+
+while True:
+  players_count=input("Type players number from 2 to 7:")
+  if not players_count.isdigit(): #input validation
+    print("Invalid input, you can type whole numbers from 2 to 7 as number of players, Try again.\n")
+    continue
+  elif not 2<=int(players_count)<=7: #range validation
+    print("Invalid range, you can type whole numbers from 2 to 7 as number of players, Try again.\n")
+    continue
+  else: #saving players count
+    players_count=int(players_count)
+    print("Number of players defined, starting the game...")
+    break
+
+#initial setup for players
+for i in range(1,players_count+1):
+  players_deck[i]=[]
+
+
+#defining a function to save who has a deck bigger than 16 and wants to stop
+players_eliminated={}
+players_stopped={}
+def players_stop():
+  players_stop_check=True
+  if (players_count - (len(players_stopped)+len(players_eliminated))) in [0,1]: #checking if there is one or less player
+    players_stop_check=False
+  while players_stop_check: #asking whether stop if there are more than one player
+    ask_stop=input("\nType how many players want to stop. If everyone wants to go on type '0':")
+    if ask_stop=="0": #condition of no one wants to stop
+      break
+    elif not ask_stop.isdigit(): #input validation
+      print("Invalid input, only type players numbers.")
+      continue
+    elif not int(ask_stop) in range(1,int(players_count)+1): #range validation
+      print("Invalid range, only type players numbers.Try again.\n")
+      continue
+
+    else: #condition of somebody/-ies want/s to stop
+      ask_stop=int(ask_stop) 
+      while ask_stop>0: #checking count of the loop regard to input
+        ask_playerno=input("Type number of player who wants to stop.")
+        if not ask_playerno.isdigit(): #input validation
+          print("Invalid input, only type players numbers.Try again.\n")
+          continue
+        elif ask_playerno in players_stopped: #checking if the input equals a player is already stopped
+          print("This player has already stopped. Try with different player.\n")
+          continue
+        elif ask_playerno in players_eliminated: #checking if the input equals a player is already eliminated
+          print("This player has already eliminated. Try with different player.\n")
+          continue
+        elif not int(ask_playerno) in range(1,int(players_count)+1): #range validation
+          print("Invalid range, only type players numbers.Try again.\n")
+          continue
+        elif sum(players_deck[int(ask_playerno)])<17: #eligibility validation
+          print("This player need to have a deck equal or bigger than 17 points.\n")
+          while True:
+            ask_again=input("Would you like to fix your input? Type 'y' for it or 'n' to decrement number of players being stopped:") #if player isnt eligible giving a chance to decrease or fix the input
+            if ask_again.lower() not in ['y','n']: #input validation
+              print("Invalid input, you need to type 'y' or 'n'. Try again.\n") 
+              continue
+            else:
+              if ask_again.lower() == 'y': #giving chance of fixing the input
+                break
+              else: #giving chance of decrease the input
+                ask_stop-=1
+                print(f"Current number of players to being stopped : {ask_stop}")
+                break
+          continue
+        else: #saving who wants to stop
+          players_stopped[int(ask_playerno)]=players_deck[int(ask_playerno)].copy()
+          print(players_stopped)
+          print(f"{int(ask_playerno)} has stopped...")
+          ask_stop-=1
+    return players_stopped 
+
+#defining a function to distribute cards one time to whom wants to go on
+def distribute_cards():
+  for key,value in players_deck.items():
+    if key not in players_stopped and key not in players_eliminated: #distributing cards to players arent stopped or eliminated
+      a=random.choice(cards_deck)
+      players_deck[key].append(a)
+      cards_deck.remove(a)
+
+#defining a function in case of having sum deck more than 21 after aces conversion
+def over_21():
+  players_deck_copy=players_deck.copy()
+  for key,value in players_deck_copy.items():
+    if sum(value)>21: #eliminating players if their deck sum bigger than 21
+      players_eliminated[key]=value
+      print(f"\nPlayer {key} eliminated with sum of deck that {sum(value)}.")
+      print(f"All eliminated players until now are:")
+      for i in players_eliminated:
+        print(i,":",players_eliminated[i])
+      del players_deck[key]
+  if not players_deck=={}: #checking if there is/are still player/s in game
+    print(f"\nCurrent decks of players in game are:")
+    for i in players_deck:
+      print(i,":",players_deck[i])
+
+#defining a function to sensible auto stop if one player exists
+def one_player_auto():
+  max_sum=0
+  if (players_count - (len(players_eliminated)+len(players_stopped))) == 1:
+    for key,value in players_stopped.items():
+      if sum(value)>max_sum:
+        max_sum=sum(value)
+    for key,value in players_deck.items():
+      if sum(value)<=max_sum: #automating to pick another card
+        one_player_check=False
+      else: #automating to stop
+        one_player_check=True
+        players_stopped[key]=players_deck[key].copy()
+        print(players_stopped)
+        print(f"{key} has stopped...")
+
+#defining a function to give the result if everybody stops 
+def result_everybody_stops(): #checking if there is only one player who hasnt stopped yet in the game
+  if one_player_auto():
+    result_check=False
+    return result_check
+  elif len(players_stopped)+len(players_eliminated)==players_count: #checking if there is no player going on in the game
+    result_check=True
+    max_sum=0
+    for key,value in players_deck.items(): #finding biggest deck sum
+      if sum(value)>max_sum:
+        max_sum=sum(value)
+    
+    #deuce condition
+    count=0
+    for key,value in players_deck.items():
+      if sum(value)==max_sum:
+        count+=1
+    if count>=2: #giving the results if the game is deuce
+      for key,value in players_deck.items():
+        if sum(value)==max_sum:
+          print(f"\nDeuce. Player {key}. Sum of his/her deck is {value} and it is {abs(max_sum-21)} close to 21!")
+
+      print(f"Other players deck are:")
+      for i in players_stopped:
+        print(f"{i} : {players_stopped[i]}")
+      for i in players_eliminated:
+        print(f"{i} : {players_eliminated[i]}")
+    
+    #winner condition
+    else:
+      for key,value in players_deck.items():
+        if sum(value) == max_sum: #giving the winner result
+          print(f"\nThe winner is Player {key}. Sum of his/her deck is {sum(value)} and it is {abs(max_sum-21)} close to 21!")
+          print(f"The winner player Player {key}'s deck is : {value}")
+          print(f"Other players deck are:")
+          for i in players_eliminated:
+            print(f"{i} : {players_eliminated[i]}")
+    return result_check
+
+#defining a function to the case of reaching 21
+def check_21():
+  check21=False
+  count=0
+  for key,value in players_deck.items():
+    if sum(value)==21: #checking if a players deck sum reached to 21
+      check21=True
+      count+=1
+  #deuce condition
+  if count>=2:
+    for key,value in players_deck.items():
+      if sum(value)==21: #giving the results if the game is deuce
+        print(f"\nDeuce. Player {key}. Sum of his/her deck is {value} and it is {abs(max_sum-21)} close to 21!")
+    print(f"Other players deck are:")
+    for i in players_stopped:
+      print(f"{i} : {players_stopped[i]}")
+    for i in players_eliminated:
+      print(f"{i} : {players_eliminated[i]}")
+  #winner condition
+  elif count==1:
+    for key,value in players_deck.items():
+      if sum(value)==21: #giving the winner result
+        print(f"\nThe winner is Player {key}. He/she hit the 21! Congratulations!")
+        print(f"Deck of Player {key} is : {value}")
+        print(f"Other players deck are:")
+        for i in players_eliminated:
+          print(f"{i} : {players_eliminated[i]}")
+        for key,value in players_deck.items():
+          if sum(value)!=21:
+            print(f"{key} : {value}")
+  return check21
+
+#defining a function in case of having more than two aces condition
+def more_than_one_aces():
+  for key,value in players_deck.items():
+    for subvalue in value:
+      while sum(value)>21: 
+        if subvalue==11: #converting an ace from 11 to 1 if a deck sum bigger than 21
+          players_deck[key].insert(players_deck[key].index(11),1)
+          players_deck[key].remove(11)
+        else:
+          break
+
+#initial card distribution
+for i in range(1,players_count+1):
+  for z in range(2): #distributing 2 cards from start
+    a=random.choice(cards_deck)
+    players_deck[i].append(a)
+    cards_deck.remove(a)
+
+
+
+#game function begins here
+
+first_stage=True
+while True:
+
+  #giving general information of related game round
+  print(f"Remaining cards in deck : {cards_deck}")
+  for i in players_deck:
+    print(f"Player {i} : {players_deck[i]}")
+
+  #checking if somebody/-ies hit 21 from the first round
+  if first_stage:
+    first_stage=False
+    if check_21():
+      break
+  
+  #converting multiple aces to 1 in case deck sum is bigger than 21 with 11 points from aces
+  more_than_one_aces()
+
+  #checking if somebody eliminated
+  over_21()
+  
+  #checking if somebody/-ies hit 21
+  if check_21():
+    break
+  
+  #giving the result if everybody stopped or eliminated 
+  if result_everybody_stops():
+    break
+
+  #asking whether anyone who is able to do wants to stop
+  players_stop()
+
+  #distributing 1 card to players who is going on
+  distribute_cards()
