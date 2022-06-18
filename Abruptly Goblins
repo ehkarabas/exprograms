@@ -1,0 +1,346 @@
+"""
+#1st instruction starts here
+
+Introduction
+Opening your comic book store, the Sorcery Society, has been a lifelong dream come true. 
+You quickly diversified your shop offerings to include miniatures, plush toys, collectible card games, and board games. 
+Eventually, the store became more a games store with a selection of this week's newest comic books and a small offering of graphic novel paperbacks. 
+Completing your transformation means offering space for local tabletop gamers. 
+They love to play their favorite RPG, "Abruptly Goblins!" and will happily pay you per chair to secure the space to do it. 
+Unfortunately, planning the game night has fallen to you. 
+If you pick the wrong night, not enough people will come and the game night will be cancelled. 
+You decide it's best that you automate the game night selector to get the most people through the door. 
+First you need to create a list of people who will be attending the game night.
+
+Instructions
+
+Create an empty list called gamers. 
+This will be your list of people who are attending game night.
+"""
+#1st code block starts here
+
+gamers=[]
+
+"""
+#2nd instruction starts here
+
+Now we want to create a function that will update this list and add a new gamer to the this gamers list. 
+Each gamer should be a dictionary with the following keys:
+
+"name": a string that contains the gamer's full or presumed name. E.g., "Vicky Very"
+"availability": a list of strings containing the names of the days of the week that the gamer is available. E.g., ["Monday", "Thursday", "Sunday"]
+
+Instructions:
+Create a function called add_gamer that takes two parameters: gamer and gamers_list. 
+The function should check that the argument passed to the gamer parameter has both "name" and a "availability" as keys and if so add gamer to gamers_list.
+"""
+#2nd code block starts here
+
+def add_gamer(gamer,gamers_list):
+  #checking arguments data type
+  if not isinstance(gamer,dict) or\
+     not isinstance(gamers_list,list):
+    raise TypeError("Gamer must be a dictionary data," +
+                    " gamers_list must be a list data. Try again.")
+  values=[value for value in gamer.values()]
+  #validation of argument datas
+  if [key for key in gamer.keys()]!=["name","availability"] or\
+     type(values[0])!=str or\
+     type(values[1])!=list:
+       raise AssertionError("Gamer dictionary should have string keys" + 
+                            " called 'name' and 'avilability" + 
+                            " and value of name should be a string data," + 
+                            " value of availability should be a list data.")
+  #editing gamers_list list
+  else:
+    gamers_list.append(gamer)
+    return gamers_list
+
+"""
+#3rd instruction starts here
+
+Next we want to add our first gamer! 
+Her name is Kimberly Warner and she's available on Mondays, Tuesdays, and Fridays.
+
+Instructions:
+
+Create a dictionary called kimberly with the name and availability given above.
+Call add_gamer with kimberly as the first argument and gamers as the second.
+"""
+#3rd code block starts here
+
+kimberly={"name":"Kimberly Warner",\
+          "availability":["Monday","Tuesday","Friday"]}
+add_gamer(kimberly,gamers)
+
+"""
+Great! Let's add a couple more gamers to the list!
+"""
+#given dictionary datas for people
+
+add_gamer({'name':'Thomas Nelson','availability': ["Tuesday", "Thursday", "Saturday"]}, gamers)
+add_gamer({'name':'Joyce Sellers','availability': ["Monday", "Wednesday", "Friday", "Saturday"]}, gamers)
+add_gamer({'name':'Michelle Reyes','availability': ["Wednesday", "Thursday", "Sunday"]}, gamers)
+add_gamer({'name':'Stephen Adams','availability': ["Thursday", "Saturday"]}, gamers)
+add_gamer({'name': 'Joanne Lynn', 'availability': ["Monday", "Thursday"]}, gamers)
+add_gamer({'name':'Latasha Bryan','availability': ["Monday", "Sunday"]}, gamers)
+add_gamer({'name':'Crystal Brewer','availability': ["Thursday", "Friday", "Saturday"]}, gamers)
+add_gamer({'name':'James Barnes Jr.','availability': ["Tuesday", "Wednesday", "Thursday", "Sunday"]}, gamers)
+add_gamer({'name':'Michel Trujillo','availability': ["Monday", "Tuesday", "Wednesday"]}, gamers)
+
+"""
+#4th instruction starts here
+
+Finding the perfect availability
+Now that we have a list of all of the people interested in game night, we want to be able to calculate which nights would have the most participation. 
+First we need to create a frequency table which correlates each day of the week with gamer availability.
+
+Instructions
+
+Create a function called build_daily_frequency_table that takes no argument returns a dictionary with the days of the week as keys and 0s for values. 
+We'll be using this to count the availability per night. Call build_daily_frequency_table and save the results to a variable called count_availability.
+"""
+#4th code block starts here
+
+def build_daily_frequency_table():
+  return {"Monday":0,
+          "Tuesday":0,
+          "Wednesday":0,
+          "Thursday":0,
+          "Friday":0,
+          "Saturday":0,
+          "Sunday":0}
+
+count_availability=build_daily_frequency_table()
+
+"""
+#5th instruction starts here
+
+Next we need to count the number of people every night.
+
+Instructions
+
+Write a function called calculate_availability that takes a list of gamers as an argument gamers_list and a frequency table available_frequency. 
+The function should iterate through each gamer in gamers_list and iterate through each day in the gamer's availability. 
+For each day in the gamer's availability, add one to that date on the frequency table.
+"""
+#5th code block starts here
+
+def calculate_availability(gamers_list,available_frequency):
+  #checking arguments data type
+  if not isinstance(gamers_list,list) or\
+    not isinstance(available_frequency,dict):
+    raise TypeError("gamers_list must be a list data," +
+                    " available frequency must be a dictionary data. Try again.")
+  #building gamers_list checkset
+  keys=set([key for i in gamers_list for key in i.keys()])
+  values=[value for i in gamers_list for value in i.values()]
+  count,values_str,values_list=0,[],[]
+  for i in values:
+    count+=1
+    if count%2:
+      values_str.append(i)
+    else:
+      values_list.append(i)
+  #validation of argument datas
+  if set([key for key in available_frequency.keys()])&{"Monday","Tuesday",
+                                                       "Wednesday","Thursday",
+                                                       "Friday","Saturday","Sunday"}==set() or\
+    [i for i in available_frequency.values() if type(i)!=int]!=list() or\
+    keys!={"name","availability"} or\
+    [i for i in values_str if type(i)!=str]!=[] or\
+    [i for i in values_list if type(i)!=list]!=[]:
+      raise AssertionError("Available_frequency should have keys named with days of week" +
+                          " and values of keys should be integer data," +
+                          " gamer dictionary should have string keys" + 
+                          " called 'name' and 'avilability" + 
+                          " and value of name should be a string data," + 
+                          " value of availability should be a list data.")
+  #editing available_frequency dictionary
+  else:
+    game_days=[day\
+               for i in gamers_list\
+               for value in i.values()\
+               for day in value if type(value)==list]
+    for i in game_days:
+      available_frequency[i]+=1
+    return available_frequency
+
+"""
+#6th instruction starts here
+
+Now let's use these tools to find the best night to run Abruptly Goblins!
+
+Instructions
+
+Call calculate_availability with gamers and count_availability. Print out count_availability afterwards.
+"""
+#6th code block starts here
+
+calculate_availability(gamers,count_availability)
+
+"""
+#7th instruction starts here
+
+Lastly we need a way to pick the day with the most available people to attend so that we can schedule game night on that night.
+
+Instructions
+
+Write a function find_best_night that takes a dictionary availability_table and returns the key with the highest number.
+"""
+#7th code block starts here
+
+def find_best_night(availability_table):
+  #checking data type of the argument
+  if not isinstance(availability_table,dict):
+    raise TypeError("availability_table must be a dictionary data. Try again.")
+  #validation of argument datas
+  elif set([key for key in availability_table.keys()])&{"Monday","Tuesday",
+                                                        "Wednesday","Thursday",
+                                                        "Friday","Saturday","Sunday"}==set() or\
+       [i for i in availability_table.values() if type(i)!=int]!=list():
+         raise AssertionError("Availability_table should have keys named with days of week" +
+                              " and values of keys should be integer data.")
+  #returning highest value with its key
+  else:
+    for key,value in availability_table.items():
+      if value==availability_table[max(availability_table,\
+                                       key=availability_table.get)]:
+        return key
+
+"""
+#8th instruction starts here
+
+Now let's find the best day to host game night.
+
+Instructions
+
+Call find_best_night with count_availability, store the result in a variable called game_night. 
+Print out game_night to find out which day it is.
+"""
+#8th code block starts here
+
+game_night=find_best_night(count_availability)
+print(game_night)
+
+"""
+#9th instruction starts here
+
+And let's make a list of all of the people who are available that night.
+
+Instructions
+
+Create a function available_on_night that takes two parameters: gamers_list and day and returns a list of people who are available on that particular day.
+Call available_on_night with gamers and game_night and save the result into the variable attending_game_night.
+Print attending_game_night.
+"""
+#9th code block starts here
+
+def available_on_night(gamers_list,day):
+  #checking arguments data type
+  if not isinstance(gamers_list,list) or\
+    not isinstance(day,str):
+    raise TypeError("gamers_list must be a list data," +
+                    " day must be a string data. Try again.")
+  #validation of argument datas
+  elif [i for i in gamers_list if type(i)!=dict]!=[] or\
+       [key for i in gamers_list\
+            for key in i.keys() if key not in ("name","availability")]!=[] or\
+       [i["name"] for i in gamers_list if type(i["name"])!=str]!=[] or\
+       [i["availability"] for i in gamers_list if type(i["availability"])!=list]!=[]:
+         raise AssertionError("Gamers_list should have dictionaries," +
+                              " items of gamers_list should have string keys" + 
+                              " called 'name' and 'avilability" + 
+                              " and value of name should be a string data," + 
+                              " value of availability should be a list data.")
+  #creating attendee list
+  else:
+    return [i["name"] for i in gamers_list\
+            if day in i["availability"]]
+
+attending_game_night=available_on_night(gamers,game_night)
+print(attending_game_night)
+
+"""
+#10th instruction starts here
+
+Generating an E-mail for the Participants
+With the best day for Abruptly Goblins! determined with computer precision, we need to let the attendees know that the game night is on a night they can attend. 
+Let's start by creating a form email to send to each of the participants that we'll fill out with data later.
+
+Instructions
+
+Define a string, called form_email with interpolation variables {name}, {day_of_week}, and {game} 
+(in case we decide we want to use this featureset to host a different game night). 
+Use it to tell your gaming attendees the night their Abruptly Goblins! game can be played.
+"""
+#10th code block starts here
+
+form_email = \
+"""
+Dear {name},
+
+We organized a game night about an enjoyable and immersive RPG game called {game}.
+We invite you to our game night, hoping that you are available for the {day_of_week} night. 
+Your participation will be our pleasure.
+
+Best wishes!
+"""
+
+"""
+#11th instruction starts here
+
+Instructions
+
+Create a function send_email with three parameters: gamers_who_can_attend, day, and game. 
+Print form_email for each gamer in gamers_who_can_attend with the appropriate day and game. 
+Call send_email with attending_game_night, game_night, and "Abruptly Goblins!".
+"""
+#11th code block starts here
+
+def send_email(gamers_who_can_attend = attending_game_night,\
+               day = game_night,\
+               game = "Abruptly Goblins!"):
+  number_of_attendees = range(len(gamers_who_can_attend))
+  for i in number_of_attendees:
+    print(form_email.format(name=gamers_who_can_attend[i],game=game,day_of_week=day))
+
+send_email(attending_game_night,game_night,"Abruptly Goblins!")
+
+"""
+#12th instruction starts here
+
+Afterward
+You feel bad for the folks who weren't able to attend on the decided upon game night, 
+and try to use your currently written methods to have a second game night of the week.
+
+Instructions
+
+Create a list unable_to_attend_best_night of everyone in gamers that wasn't able to attend game night on game_night.
+Create second_night_availability frequency table by calling build_daily_frequency_table.
+Call calculate_availability with unable_to_attend_best_night and second_night_availability.
+Call find_best_night with the now filled-in second_night_availability, save the results in second_night.
+"""
+#12th code block starts here
+
+unable_to_attend_best_night = [i for i in gamers\
+                               if i["name"] not in attending_game_night]
+second_night_availability=build_daily_frequency_table()
+calculate_availability(unable_to_attend_best_night,second_night_availability)
+second_night=find_best_night(second_night_availability)
+print(second_night)
+
+"""
+#13th instruction starts here
+
+Let's send out an email to everyone (whether they can attend the first night or not) whose marked themselves as available on our second game night.
+
+Instructions
+
+Create the list available_second_game_night by calling available_on_night with gamers and second_night
+Let the gamers know by calling send_email with available_second_game_night, second_night, and "Abruptly Goblins!"
+"""
+#13th code block starts here
+
+available_second_game_night=available_on_night(gamers,second_night)
+send_email(available_second_game_night,second_night)
