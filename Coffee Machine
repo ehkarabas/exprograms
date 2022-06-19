@@ -1,0 +1,143 @@
+#defining resource datas initially
+Water, Milk, Coffee, Money = 5000, 5000, 5000, 0
+quarters, dimes, nickles, pennies = 0.25, 0.10, 0.05, 0.01
+
+#defining a function to return ingredients of order
+def coffee_resource(cof):
+  if cof == "latte":
+    return (200,50,20)
+  elif cof == "cappucino":
+    return (175,40,25)
+  elif cof == "espresso":
+    return (150,30,30)
+
+#defining a function to return price of order
+def coffee_price(cof):
+  if cof == "latte":
+    return 2.56
+  elif cof == "cappucino":
+    return 2.22
+  elif cof == "espresso":
+    return 2.43
+
+#defining a function to build coin insertion loop
+def coin_inserter():
+  coin_dict={"q" : "quarters",
+             "d" : "dimes",
+             "n" : "nickles",
+             "p" : "pennies"}
+  while True:
+    cointype = input("Type 'q' for quarters, 'd' for dimes," +
+                   " 'n' for nickles, 'p' for pennies to insert : ")
+    if cointype not in ("q","d","n","p"):
+      print("Invalid input, type only 'q','d','n' or 'p'. Try again\n")
+      continue
+    else:
+      break
+  while True:
+    coincount = input(f"Type how many {coin_dict[cointype]}" +
+                      " you want to insert. Type 0 to 0 : ")
+    if not coincount.isdigit():
+      print("Invalid input, type 0 or positive integers. Try again\n")
+      continue
+    else:
+      if cointype == "q":
+        return int(coincount) * 0.25
+      if cointype == "d":
+        return int(coincount) * 0.10
+      if cointype == "n":
+        return int(coincount) * 0.05
+      else:
+        return int(coincount) * 0.01
+
+#defining a function to check resources before brewing
+def resource_check(order_tuple):
+  global Water, Milk, Coffee
+  if (Water - order_tuple[0]) < 0:
+    print("Insufficient water, sorry")
+    return False
+  elif (Milk - order_tuple[1]) < 0:
+    print("Insufficient milk, sorry")
+    return False
+  elif (Coffee - order_tuple[2]) < 0:
+    print("Insufficient coffee, sorry")
+    return False
+  else:
+    return True
+
+#defining a function to deduct resources after brewing
+def resource_deductor(order_tuple):
+  global Water, Milk, Coffee
+  Water -= order_tuple[0]
+  Milk -= order_tuple[1]
+  Coffee -= order_tuple[2]
+  
+  
+#creating top level loop for the machine
+while True:
+  order = input("What would you like? (espresso/latte/cappuccino) : ")
+  order = order.lower()
+  #creating a special condition to turn off the machine
+  if order == "off":
+    break
+  #creating a special condition to display resources
+  if order == "report":
+    print(f"Water: {Water}ml",
+          f'Milk: {Milk}ml',
+          f"Coffee: {Coffee}g",
+          f'Money: ${Money}', sep = "\n")
+    continue
+  #validation of order
+  elif order not in ("espresso","latte","cappuccino"):
+    print("Type 'cappucino' to order cappucino," +
+          " 'latte' to order latte and" + 
+          " 'espresso' to order espresso." +
+          " Different inputs will be invalid. Try again.\n")
+    continue
+  #checking if resources are sufficient 
+  elif not resource_check(coffee_resource(order)):
+    continue 
+  else:
+    #calculating inserted coins
+    coins_inserted = 0
+    while True:
+      coins_inserted += coin_inserter()
+      while True:
+        repeat=input("Do you want to insert more coins?" +
+                    " Type 'y' to Yes, 'n' to No : ")
+        if repeat not in ("y","n"):
+          print("Invalid input, only type 'y' or 'n'. Try again\n")
+          continue
+        else:
+          break
+      if repeat == "y":
+        continue
+      else:
+        break
+    #checking if inserted coins enough for the order
+    if coins_inserted < coffee_price(order):
+      print("Sorry that's not enough money. Money refunded.")
+      continue
+    #start brewing if inserted coins are enough
+    elif coins_inserted >= coffee_price(order):
+      Money += coffee_price(order)
+      initial_resources = Water, Milk, Coffee, Money
+      resource_deductor(coffee_resource(order))
+      #returning change to the customer if inserted coins more than enough
+      if coins_inserted > coffee_price(order):
+        print(f"Here is ${round((coins_inserted - coffee_price(order)),2)} in change.")
+      #displaying resources before and after the order
+      print(f"Report before purchasing {order} : ", 
+            f'Water : {initial_resources[0]}',
+            f"Milk : {initial_resources[1]}",
+            f'Coffee : {initial_resources[2]}',
+            f"Money : {initial_resources[3]}", sep = "\n")
+      print(f"Report after purchasing {order} : ", 
+            f'Water : {Water}',
+            f"Milk : {Milk}",
+            f'Coffee : {Coffee}',
+            f"Money : {Money}", sep = "\n")
+      #serving the order to the customer
+      print(f'Here is your {order}. Enjoy!')
+      #going back to the initial screen
+      continue
