@@ -1,0 +1,70 @@
+from random import choice
+from collections import Counter
+from copy import deepcopy
+
+#building chessboard and copy its original form
+chessboard = [[0 for i in range(8)] for i in range(8)]
+chessboard_copy = deepcopy(chessboard)
+
+#creating a function to place vizier
+def place_vizier(line):
+  global chessboard
+  if not isinstance(line,int):
+    raise TypeError("line argument must be an integer data.")
+  elif line not in range(8):
+    raise AssertionError("line argument must be 1 to 8.")
+  else:
+    counts = Counter(chessboard[line])
+    pos0 = dict()
+    for i,n in enumerate(chessboard[line]):
+      if counts[n] > 0 and n == 0:
+       pos0.setdefault(n,[]).append(i)
+    if pos0 == dict():
+      return False
+    else:
+      chessboard[line][choice([y for i in pos0.values() for y in i])] = 1
+      return chessboard
+
+#creating a function to escape index errors
+def catch_index_error(index,mylist):
+  try:
+    return mylist[index]
+  except IndexError:
+    return False
+
+#creating a function to block cells based on the previously placed vizier
+def cell_block(line):
+  global chessboard
+  vizierpos = chessboard[line].index(1)
+  for i in range(1,8):
+    if catch_index_error(line + i,chessboard):
+      chessboard[line+i][vizierpos] = 3
+      if catch_index_error(vizierpos + i,chessboard):
+        chessboard[line+i][vizierpos+i] = 4
+      if vizierpos - i >= 0:
+        chessboard[line+i][vizierpos-i] = 2
+  return chessboard
+
+#building a loop for a successful attempt of placing 8 viziers
+while 1 not in chessboard[7]:
+  for i in range(8):
+    if not place_vizier(i):
+      chessboard = deepcopy(chessboard_copy)
+      break
+    cell_block(i)
+
+#rebuilding chessboard visualization
+for line in range(8):
+  counts = Counter(chessboard[line])
+  pos_not0 = dict()
+  for i,n in enumerate(chessboard[line]):
+    if counts[n]>=1 and n not in (0,1):
+      pos_not0.setdefault(n,[]).append(i)
+  for not0_indexlist in pos_not0.values():
+    for i in not0_indexlist:
+      chessboard[line][i] = 0
+
+#printing one of the possible results
+print(format("FINAL BOARD","*^25s"),"\n",sep="")
+for i in chessboard:
+  print(i)
