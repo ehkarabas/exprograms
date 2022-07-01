@@ -1,0 +1,108 @@
+#saving comparison datas into a dictionary
+paranthesis_open = {"(" : ")", 
+                    "{" : "}", 
+                    "[" : "]"}
+paranthesis_close = {value : key for key, value in paranthesis_open.items()}
+
+#defining a function to check if brackets placed correct
+def bracketchecker(brackets):
+  #saving indexes of items into a dictionary
+  checkdict={}
+  for index,item in enumerate(brackets):
+    checkdict.setdefault(item,[]).append(index)
+  #checking correctness of every item
+  for i in brackets:
+    #checking if numbers of closing and opening brackets are equal
+    if i not in paranthesis_open and i not in paranthesis_open.values():
+      return False
+    elif i in paranthesis_open:
+      #checking if the open bracket has its close bracket in the input
+      if paranthesis_open[i] not in checkdict:
+        return False
+      #checking if closing brackets index number less than opening brackets index number
+      elif len(checkdict[i]) != len(checkdict[paranthesis_open[i]]):
+        return False
+      #print(checkdict[i])
+      else:
+        for a in range(len(checkdict[i])):
+          if checkdict[i][a] > checkdict[paranthesis_open[i]][a] :
+            return False
+        #matching correct brackets and removing their data
+        y = 1
+        while len(checkdict[i]) != 0:
+          #checking total count of the opening bracket  at first
+          if not len(checkdict[i]) == 1:
+            #checking for individual closed brackets 
+            #checking inner closed brackets firstly
+            if checkdict[i][y] > checkdict[paranthesis_open[i]][0]:
+              #checking for an odd number of items in total between opening and closing brackets
+              if not (checkdict[paranthesis_open[i]][0] - checkdict[i][y-1]) % 2:
+                return False
+              #removing data for the correct match
+              else:
+                checkdict[paranthesis_open[i]].pop(0)
+                checkdict[i].pop(y-1)
+                #checking if the bracket is final item
+                if len(checkdict[i]) == 1:
+                  if not (checkdict[paranthesis_open[i]][0] - checkdict[i][0]) % 2:
+                    return False
+                  else:
+                    break
+                else:
+                  y = 1
+            #iterating to next bracket
+            else:
+                y += 1
+                #checking nested closed brackets correctness if the bracket is not individually closed 
+                #chekcing inner closed brackets firstly
+                if y == len(checkdict[i]):
+                  while len(checkdict[i]) > 1:
+                    if not (checkdict[paranthesis_open[i]][0] - checkdict[i][-1]) % 2:
+                      return False
+                    else:
+                        checkdict[paranthesis_open[i]].pop(0)
+                        checkdict[i].pop(-1)
+          else:
+            if not (checkdict[paranthesis_open[i]][0] - checkdict[i][0]) % 2:
+              return False
+            else:
+              break
+    #iterating next item if item is a closing bracket
+    elif i in paranthesis_close:
+      #checking if the close bracket has its open bracket in the input
+      if paranthesis_close[i] not in checkdict:
+        return False
+      else:
+        continue
+    #returning False in case of inputting except of brackets
+    else:
+      return False
+  
+  #checking for data redundancy as False
+  for i in checkdict.values():
+    if len(i) != 1 :
+      print(i)
+      return False
+  
+  #returning True if no False returned from anywhere
+  return True
+
+
+#These "asserts" using only for self-checking
+if __name__ == '__main__':
+    print('"([{(}])[()]" and "([{()}])[()]" Examples:')
+    print(bracketchecker("([{(}])[()]"),bracketchecker("([{()}])[()]"),sep="\t\t")
+
+    assert bracketchecker("([{(}])[()]") == False, "Need to return False"
+    assert bracketchecker("([{()}])[()]") == True, "Need to return True"
+    assert bracketchecker("([{((([[]])))}]){[()]}") == True, "Need to return True"
+    assert bracketchecker("(([]{{}}))") == True, "Need to return True"
+    assert bracketchecker("([{({[[]]})}])") == True, "Need to return True"
+    assert bracketchecker("(([]{{}}))") == True, "Need to return True"
+    assert bracketchecker("") == True, "Need to return True"
+    assert bracketchecker("([{(())}])[({)]}") == False, "Need to return False"
+    assert bracketchecker("}") == False, "Need to return False"
+    assert bracketchecker("()[.]") == False, "Need to return False"
+    assert bracketchecker("{") == False, "Need to return False"
+    assert bracketchecker("[}") == False, "Need to return False"
+    print("Function working as expected!")
