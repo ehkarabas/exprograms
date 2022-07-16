@@ -1,0 +1,137 @@
+# building a Menu class firstly
+class Menu :
+  def __init__(self, name, items, start_time, end_time) :
+    self.name = name
+    self.items = items
+    self.start_time = start_time
+    self.end_time = end_time
+  # creating object representation as string
+  def __repr__(self) :
+    return f"{self.name} menu available from {self.start_time} to {self.end_time}"
+  # creating a method to calculate total price of order
+  def calculate_bill(self, purchased_items: list):
+    total = 0
+    for item, price in self.items.items():
+      if item in purchased_items:
+        total += price
+    return total
+
+# creating 4 menus according to the Menu class
+brunch_items = {
+                'pancakes': 7.50, 'waffles': 9.00, 'burger': 11.00, 
+                'home fries': 4.50, 'coffee': 1.50, 'espresso': 3.00, 
+                'tea': 1.00, 'mimosa': 10.50, 'orange juice': 3.50
+                }
+
+brunch_menu = Menu("Brunch", brunch_items, "11:00", "16:00")
+
+
+early_bird_items = { 
+'salumeria plate': 8.00, 'salad and breadsticks (serves 2, no refills)': 14.00, 
+'pizza with quattro formaggi': 9.00, 'duck ragu': 17.50, 'mushroom ravioli (vegan)': 13.50, 
+'coffee': 1.50, 'espresso': 3.00 
+}
+
+early_bird_menu = Menu("Early-Bird", early_bird_items, "15:00", "18:00")
+
+
+dinner_items = {
+'crostini with eggplant caponata': 13.00, 'caesar salad': 16.00, 
+'pizza with quattro formaggi': 11.00, 'duck ragu': 19.50, 
+'mushroom ravioli (vegan)': 13.50, 'coffee': 2.00, 'espresso': 3.00,
+}
+
+dinner_menu = Menu("Dinner", dinner_items, "17:00", "23:00")
+
+
+kids_items = {
+              'chicken nuggets': 6.50, 'fusilli with wild mushrooms': 12.00, 'apple juice': 3.00
+              }
+
+kids_menu = Menu("Kids", kids_items, "11:00", "21:00")
+
+# testing the data of a menu
+print(brunch_menu)
+
+print()
+# testing the method that shows total price of an order
+print(brunch_menu.calculate_bill(["pancakes", "home fries", "coffee"]))
+print(early_bird_menu.calculate_bill(["salumeria plate", "mushroom ravioli (vegan)"]))
+
+
+# building a Franchise Class to set up new restaurants
+class Franchise :
+  def __init__(self, address : str, menus : list) :
+    self.address = address
+    self.menus = menus
+  # creating object representation as string
+  def __repr__(self) :
+    return f"This restaurant is at {self.address}"
+  # creating a method to show available menus according to time specified
+  def available_menus(self, time : str) :
+    available_menus = []
+    for i in self.menus :
+      # if int(i.start_time[:2] + i.start_time[3:]) <= int(time[:2] + time[3:]) \
+      # <= int(i.end_time[:2] + i.end_time[3:]) :
+      if int(i.start_time.replace(":","")) <= int(time.replace(":","")) \
+      <= int(i.end_time.replace(":","")) : 
+        available_menus.append(i.name + " Menu")
+    return f"Our available menus at {time} : {available_menus}"
+
+# creating 2 franchises according to Franchise class
+flagship_store = Franchise("1232 West End Road",[brunch_menu, early_bird_menu, dinner_menu, kids_menu])
+new_installment = Franchise("12 East Mulberry Street",[brunch_menu, early_bird_menu, dinner_menu, kids_menu])
+
+print()
+# testing the data of a franchise
+print(flagship_store)
+# testing the method that shows available menus according to time specified
+print(flagship_store.available_menus("12:00"))
+print(flagship_store.available_menus("17:00"))
+
+
+# building a Business Class to set up new businesses
+class Business:
+  def __init__(self, name, franchises : list) :
+    self.name = name
+    self.franchises = franchises
+  # creating object representation as string
+  def __repr__(self):
+    return f"{self.name} is one of our businesses."
+
+# creating a business according to Business class
+first_business = Business("Basta Fazoolin' with my Heart", [flagship_store, new_installment])
+
+# creating a brand new business according to Franchise and Business classes
+arepas_menu = {
+  'arepa pabellon': 7.00, 'pernil arepa': 8.50, 'guayanes arepa': 8.00, 'jamon arepa': 7.50
+}
+
+arepas_place = Franchise("189 Fitzgerald Avenue", [arepas_menu])
+
+new_business = Business("Take a' Arepa", [arepas_place])
+
+
+# printing objects of all classes separately
+
+import gc
+
+#code below can print all instances of a class
+# for obj in gc.get_objects():
+#     if isinstance(obj, class):
+#         print(obj)
+
+print("\nObjects of Menu class are : ")
+for obj in gc.get_objects():
+    if isinstance(obj, Menu):
+        print(obj)
+
+print("\nObjects of Franchise class are : ")
+for obj in gc.get_objects():
+    if isinstance(obj, Franchise):
+        print(obj)
+
+print("\nObjects of Business class are : ")
+for obj in gc.get_objects():
+    if isinstance(obj, Business):
+        print(obj)
